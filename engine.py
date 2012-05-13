@@ -574,7 +574,7 @@ class engine:
                         #print "Channeling..."
                         digtype = 7 # create an up ramp
                         diglevel = mob.job.dest[2] - 1 #the z level below
-                        self.m.writeMap(mob.job.dest[0], mo.job.dest[1], diglevel, digtype) # default to a green tile for now.
+                        self.m.writeMap(mob.job.dest[0], mob.job.dest[1], diglevel, digtype) # default to a green tile for now.
                         self.m.setBlocked(mob.job.dest[0], mob.job.dest[1], diglevel, False) # unblock the tile
                         digtype = 5 # put an empty tile on top
                         self.m.writeMap(mob.job.dest[0], mob.job.dest[1], mob.job.dest[2], digtype) # default to a green tile for now.
