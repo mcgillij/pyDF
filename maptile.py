@@ -1,18 +1,20 @@
 try:
-
+    import sys
     import pygame
     from pygame.locals import *
     import loader
     from item import Item
-except ImportError, err:
-    print "couldn't load module. %s" % (err)
+except ImportError as err:
+    print(f"couldn't load module. {err}")
     sys.exit(2)
+
 
 class MapTile():
     """ MapTile class, generic class for a tile """
+
     def __init__(self, value):
         self.value = value
-#        self.image, self.rect = loader.load_png(imagename)
+        #        self.image, self.rect = loader.load_png(imagename)
         self.content = []
         self.mobs = []
         if int(self.value) == int(0) or int(self.value) == int(5):
@@ -22,10 +24,9 @@ class MapTile():
 
     def digTile(self, value):
         oldvalue = self.value
-#        self.image, self.rect = loader.load_png(image)
+        #        self.image, self.rect = loader.load_png(image)
         self.value = value
         self.add(Item('crumbledwall', 16))
-
 
     def addMob(self, mob):
         self.mobs.append(mob)

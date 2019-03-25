@@ -3,8 +3,8 @@ try:
     import pygame
     import sys
     from pygame.locals import *
-except ImportError, err:
-    print "couldn't load module, %s" % (err)
+except ImportError as err:
+    print(f"couldn't load module, {err}")
     sys.exit(2)
 
 class Intro(object):
@@ -24,7 +24,7 @@ class Intro(object):
         surface.blit(textobj, textrect)
 
     def waitForKey(self):
-        running = True;
+        running = True
         while True:
             for event in pygame.event.get():
                 if event.type == QUIT:

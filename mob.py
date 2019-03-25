@@ -6,16 +6,18 @@ try:
     from time import time
     import pprint
     import loader
-    import ConfigParser, os
-except ImportError, err:
-    print "couldn't load module. %s" % (err)
+    import configparser, os
+except ImportError as err:
+    print(f"couldn't load module. {err}")
     sys.exit(2)
+
 
 class Mob(pygame.sprite.Sprite):
     """ Mob class, generic class for a sprite """
+
     def __init__(self, position, tw):
         self.tw = tw
-        config = ConfigParser.ConfigParser()
+        config = configparser.ConfigParser()
         config.readfp(open('mob.cfg'))
         imageset = 'imagename' + str(self.tw)
         imagename = config.get('mob', imageset)

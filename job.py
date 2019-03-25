@@ -5,8 +5,8 @@ try:
     import os
     from pygame.locals import *
     import pprint
-except ImportError, err:
-    print "couldn't load module. %s" % (err)
+except ImportError as err:
+    print("couldn't load module. {err}")
     sys.exit(2)
 
 class Job(object):

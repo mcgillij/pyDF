@@ -7,9 +7,9 @@ try:
     from time import time
     import pprint
     import loader
-    from ConfigParser import ConfigParser
-except ImportError, err:
-    print "couldn't load module. %s" % (err)
+    from configparser import ConfigParser
+except ImportError as err:
+    print(f"couldn't load module. {err}")
     sys.exit(2)
 
 class Item(pygame.sprite.Sprite):

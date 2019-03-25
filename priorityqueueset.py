@@ -1,5 +1,6 @@
 import heapq
 
+
 class PriorityQueueSet(object):
     """ Combined priority queue and set data structure. Acts like
         a priority queue, except that its items are guaranteed to
@@ -34,11 +35,12 @@ class PriorityQueueSet(object):
         Note that for native Python objects (strings, tuples, 
         etc.) these operators are already defined as needed.
     """
+
     def __init__(self):
         """ Create a new PriorityQueueSet
         """
         self.set = {}
-        self.heap = []    
+        self.heap = []
 
     def __len__(self):
         return len(self.heap)
@@ -47,7 +49,7 @@ class PriorityQueueSet(object):
         """ Check if *item* exists in the queue
         """
         return item in self.set
-    
+
     def pop_smallest(self):
         """ Remove and return the smallest item from the queue.
             IndexError will be thrown if the queue is empty.
@@ -55,7 +57,7 @@ class PriorityQueueSet(object):
         smallest = heapq.heappop(self.heap)
         del self.set[smallest]
         return smallest
-    
+
     def add(self, item):
         """ Add *item* to the queue. 
         
@@ -79,6 +81,5 @@ class PriorityQueueSet(object):
                     heapq.heapify(self.heap)
                     self.set[item] = item
                     return True
-        
+
         return False
-        

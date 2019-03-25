@@ -131,13 +131,19 @@ class PathFinder(object):
             return self.coord == other.coord
         
         def __cmp__(self, other):
-            return cmp(self.f_cost, other.f_cost)
+            return (self.f_cost>other.f_cost)- (self.f_cost<other.f_cost) #cmp(self.f_cost,other.f_cost)
         
         def __hash__(self):
             return hash(self.coord)
 
         def __str__(self):
             return 'N(%s) -> g: %s, f: %s' % (self.coord, self.g_cost, self.f_cost)
+
+        def __lt__(self, other):
+            return self.f_cost < other.f_cost
+
+        def __gt__(self, other):
+            return self.f_cost> other.f_cost
 
         def __repr__(self):
             return self.__str__()
