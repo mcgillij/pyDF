@@ -34,7 +34,7 @@ class GameMap(object):
         self.tiledBG = pygame.Surface((numXTiles * self.tw, numYTiles * tw)).convert()
 
         config = configparser.ConfigParser()
-        config.readfp(open('gamemap.cfg'))
+        config.readfp(open('config/gamemap.cfg'))
         self.zlevels = config.getint('map', 'zlevels')
         self.currentZlevel = 0
         if not pygame.font.get_init():

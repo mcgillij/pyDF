@@ -18,7 +18,7 @@ class Mob(pygame.sprite.Sprite):
     def __init__(self, position, tw):
         self.tw = tw
         config = configparser.ConfigParser()
-        config.readfp(open('mob.cfg'))
+        config.read_file(open('config/mob.cfg'))
         imageset = 'imagename' + str(self.tw)
         imagename = config.get('mob', imageset)
         self.image, self.rect = loader.load_png(imagename)

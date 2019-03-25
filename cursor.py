@@ -18,7 +18,7 @@ class Cursor():
         self.mapx = 0
         self.mapy = 0
         config = configparser.ConfigParser()
-        config.readfp(open('cursor.cfg'))
+        config.readfp(open('config/cursor.cfg'))
         sectionname = "imagename" + str(tw)
         imagename = config.get('cursor', sectionname)
         self.image, self.rect = loader.load_png(imagename)

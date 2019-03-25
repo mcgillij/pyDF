@@ -28,7 +28,7 @@ class engine:
     def __init__(self):
         self.running = True  # set the game loop good to go
         config = configparser.ConfigParser()
-        config.read_file(open('main.cfg'))
+        config.read_file(open('config/main.cfg'))
 
         self.fsw = config.getint('main', 'fullscreenwidth')
         self.fsh = config.getint('main', 'fullscreenheight')

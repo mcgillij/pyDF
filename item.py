@@ -17,7 +17,7 @@ class Item(pygame.sprite.Sprite):
     def __init__(self, name, tw):
         self.tw = tw
         config = ConfigParser()
-        config.readfp(open('item.cfg'))
+        config.read_file(open('config/item.cfg'))
         sectionname = 'imagename' + str(self.tw)
         self.movable = True # set this to false to make unmovable items.
         self.selected = False
