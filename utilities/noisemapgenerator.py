@@ -42,14 +42,43 @@ class NoiseMapGenerator():
         noisemap = self.generate(x_offset,y_offset)
         return Image.fromarray(noisemap,'L')
 
+    def colorize(self, noisemap):
+        colorimage = noisemap.convert('RGB')
+        data = np.array(colorimage)
+        
+        deep_water = (14, 41, 163)
+        water = (74, 190, 237)
+        beach = (244, 218, 113)
+        grass = (133, 178, 89)
+        rock = (147, 149, 158)
+        snow = (207, 208, 213)
 
-    
+        for y in range(self.height):
+            for x in range(self.width):
+                color = data[y][x]
+              
+              
+                if np.all(color <= 50):
+                    data[y][x] = deep_water
+                elif np.all(color > 50) and np.all(color <= 100):
+                    data[y][x] = water
+                elif np.all(color > 100) and np.all(color <= 120):
+                    data[y][x] = beach
+                elif np.all(color > 120) and np.all(color <= 180):
+                    data[y][x] = grass
+                elif np.all(color > 180) and np.all(color <= 200):
+                    data[y][x] = rock
+                elif np.all(color > 200):
+                    data[y][x] = snow
 
-
+        return Image.fromarray(data)
 
 if __name__ == '__main__':
     SCREEN_WIDTH = 800
     SCREEN_HEIGHT = 600
     print(f'Generating sample noise map {SCREEN_WIDTH} x {SCREEN_HEIGHT} ..')
-    NoiseMapGenerator(SCREEN_WIDTH,SCREEN_HEIGHT,100,4,0.5,2,1).generate_image().show()
+    n = NoiseMapGenerator(SCREEN_WIDTH,SCREEN_HEIGHT,100,4,0.5,2,1)
+    newmap = n.generate_image()
+    n.colorize(newmap).show()
+    newmap.show()
     print('done')
