@@ -2,3 +2,4 @@ pygame==1.9.4
 noise==1.2.2
 Pillow==5.4.1
 numpy==1.16.2
+esper==1.0
