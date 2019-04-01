@@ -23,7 +23,7 @@ class NoiseMapGenerator():
         if scale < 0:
             scale = 0.0001
 
-        noisemap = np.zeros((self.height,self.width),dtype=np.float32)
+        noisemap = np.zeros((self.height,self.width),dtype=np.float32) #TODO: remove dependency on numpy ?
         h2 = self.height/2
         w2 = self.width/2
         for y in range(self.height):
@@ -34,14 +34,14 @@ class NoiseMapGenerator():
                 noisemap[y][x] = perlinValue
 
         # normalize
-        noisemap = np.interp(noisemap, (noisemap.min(), noisemap.max()), (255, 0)).astype(np.uint8)
+        noisemap = np.interp(noisemap, (noisemap.min(), noisemap.max()), (255, 0)).astype(np.uint8) #TODO: remove dependency on numpy ?
         return noisemap
 
-    def generate_image(self,scale=100,lacunarity=2,x_offset=0,y_offset=0):
+    def generate_image(self,scale=100,lacunarity=2,x_offset=0,y_offset=0): #TODO: remove dependency on numpy  and PIL - this could be a seperate util class
         noisemap = self.generate(scale,lacunarity,x_offset,y_offset)
         return Image.fromarray(noisemap,'L')
 
-    def colorize(self, noisemap):
+    def colorize(self, noisemap): #TODO: remove dependency on numpy  and PIL - this could be a seperate util class
         colorimage = noisemap.convert('RGB')
         data = np.array(colorimage)
         
