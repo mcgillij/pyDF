@@ -1,3 +1,8 @@
+"""
+Components are defined as simple Python classes.
+In keeping with a pure Entity System design philosophy, they should not contain any logic.
+They might have initialization code, but no processing logic whatsoever.
+"""
 
 class Renderable:
     def __init__(self, image, pos_x, pos_y, depth=0):
