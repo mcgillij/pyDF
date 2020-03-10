@@ -331,13 +331,13 @@ class GameMap(object):
         return True
 
     def save_map(self):
-        mapfile = file("./map.dat", "wb")
+        mapfile = open("./map.dat", "wb")
         pickle.dump(self.mapdata, mapfile, 2)
         mapfile.close
 
 
     def load_map(self):
-        mapfile = file("./map.dat", "rb")
+        mapfile = open("./map.dat", "rb")
         self.mapdata = pickle.load(mapfile)
         mapfile.close
     
