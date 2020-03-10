@@ -1,11 +1,8 @@
 try:
-
-    import pygame
-    from pygame.locals import *
-    import loader
-    import ConfigParser, os
-except ImportError, err:
-    print "couldn't load module. %s" % (err)
+    from loader import load_png
+    import configparser, os
+except ImportError as err:
+    print("couldn't load module. %s" % (err))
     sys.exit(2)
 
 class Cursor():
@@ -15,9 +12,9 @@ class Cursor():
         self.position = [x, y]
         self.mapx = 0
         self.mapy = 0
-        config = ConfigParser.ConfigParser()
-        config.readfp(open('cursor.cfg'))
+        config = configparser.ConfigParser()
+        config.read_file(open('cursor.cfg'))
         sectionname = "imagename" + str(tw)
         imagename = config.get('cursor', sectionname)
-        self.image, self.rect = loader.load_png(imagename)
+        self.image, self.rect = load_png(imagename)
     

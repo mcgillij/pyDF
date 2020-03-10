@@ -1,6 +1,7 @@
 try:
-    import pygame
-    from pygame.locals import *
+    import pygame_sdl2
+    pygame_sdl2.import_as_pygame()
+    #from pygame.locals import *
     from time import time
     import pickle
     from pprint import pprint
@@ -8,13 +9,13 @@ try:
     import mob
     import random
     from math import sqrt
-    import ConfigParser, os
+    import configparser, os
     import maptile
     import noise
     import selected
     from collections import defaultdict
-except ImportError, err:
-    print "couldn't load module, %s" % (err)
+except ImportError as err:
+    print("couldn't load module, %s" % (err))
     sys.exit(2)
 
 class GameMap(object):
@@ -28,21 +29,21 @@ class GameMap(object):
         self.startYTile = startYTile
         self.numXTiles = numXTiles
         self.numYTiles = numYTiles
-        self.tiledBG = pygame.Surface((numXTiles * self.tw, numYTiles * tw)).convert()
+        self.tiledBG = pygame_sdl2.Surface((numXTiles * self.tw, numYTiles * tw)).convert()
 
-        config = ConfigParser.ConfigParser()
-        config.readfp(open('gamemap.cfg'))
+        config = configparser.ConfigParser()
+        config.read_file(open('gamemap.cfg'))
         self.zlevels = config.getint('map', 'zlevels')
         self.currentZlevel = 0
-        if not pygame.font.get_init():
-            pygame.font.init()
-        self.arialFnt = pygame.font.SysFont('Arial', 12)
+        if not pygame_sdl2.font.get_init():
+            pygame_sdl2.font.init()
+        self.arialFnt = pygame_sdl2.font.SysFont('Arial', 12)
         imageset = "images" + str(tw)
         digset = "digimages" + str(tw)
         self.images = str(config.get('tiles', imageset)).split(', ')
         self.digimages = str(config.get('tiles', digset)).split(', ') #['digx32.png']
-        self.mapdata = [[[ 0 for cols in xrange(self.maph)] for rows in xrange(self.mapw)] for z in xrange(self.zlevels)] #          [row for row in xrange(self.zlevels)]
-        self.emapdata = [row for row in xrange(self.zlevels)]
+        self.mapdata = [[[ 0 for cols in range(self.maph)] for rows in range(self.mapw)] for z in range(self.zlevels)] #          [row for row in xrange(self.zlevels)]
+        self.emapdata = [row for row in range(self.zlevels)]
         #["wall1x32.png", "grassx32.png", "grass2x32.png", "grass3x32.png", "grass4x32.png", "waterx32.png", "magmax32.png", 'uprampx32.png', 'downrampx32.png']
         self.tileimages = []
         for i in self.images:
@@ -58,10 +59,10 @@ class GameMap(object):
         mynoise = noise.Noise(self.mapw, self.maph, self.tw)
         mylist = mynoise.generate()
         #pprint(mylist)
-        self.maprect = Rect(0, 0, self.mapw, self.maph)
-        for z in xrange(self.zlevels):
-            for x in xrange(self.mapw):
-                for y in xrange(self.maph):
+        self.maprect = pygame_sdl2.Rect(0, 0, self.mapw, self.maph)
+        for z in range(self.zlevels):
+            for x in range(self.mapw):
+                for y in range(self.maph):
                     if self.firstnum(mylist[x][y]) == z: # tile on the current layer
                         #print "grass"  
                         #self.mapdata[z][x][y] = maptile.MapTile(random.randint(1, 4))
@@ -78,10 +79,10 @@ class GameMap(object):
                         #print "nothing"
                         self.mapdata[z][x][y] = maptile.MapTile(5)
                     else:
-                        print "x:", x 
-                        print " y:", y 
-                        print "z:",z
-                        print "BOMBED"
+                        print("x:", x) 
+                        print(" y:", y) 
+                        print("z:",z)
+                        print("BOMBED")
                         exit()
                         #put nothing
                     
@@ -112,9 +113,9 @@ class GameMap(object):
         return False
 
     def initEMap(self):
-        for z in xrange(self.zlevels):
-            self.emapdata[z] = [[selected.Selected(1) for col in xrange(self.maph)] for row in xrange(self.mapw)]
-        self.emaprect = Rect(0, 0, self.mapw, self.maph)
+        for z in range(self.zlevels):
+            self.emapdata[z] = [[selected.Selected(1) for col in range(self.maph)] for row in range(self.mapw)]
+        self.emaprect = pygame_sdl2.Rect(0, 0, self.mapw, self.maph)
 
     def drawEMap(self, zlevel):
         for x in range(int(self.startXTile), int(self.startXTile + self.numXTiles)):
@@ -265,7 +266,7 @@ class GameMap(object):
 
     def get_selected_items(self):
         selected = []
-        for z in xrange(self.zlevels):
+        for z in range(self.zlevels):
             for x in range(int(self.startXTile), int(self.startXTile + self.numXTiles)):
                 for y in range(int(self.startYTile), int(self.startYTile + self.numYTiles)):
                     val = self.checkMapContent(x, y, z)
@@ -278,7 +279,7 @@ class GameMap(object):
     def get_selected(self, type):
         # will need to fix this also at some point to adjust for zlevels
         selected = []
-        for z in xrange(self.zlevels):
+        for z in range(self.zlevels):
             for x in range(int(self.startXTile), int(self.startXTile + self.numXTiles)):
                 for y in range(int(self.startYTile), int(self.startYTile + self.numYTiles)):
                     val = self.checkEMap(x, y, z)
@@ -299,7 +300,7 @@ class GameMap(object):
         """
         slist = []
         calc_z = c[2] # zlevel
-        rangez = range(self.zlevels)
+        rangez = list(range(self.zlevels))
         minz = rangez.pop(0)
         maxz = rangez.pop()
 
@@ -341,9 +342,9 @@ class GameMap(object):
         mapfile.close
     
     def find_open_spot(self):
-        for z in xrange(self.zlevels):
-            for x in xrange(self.mapw):
-                for y in xrange(self.maph):
+        for z in range(self.zlevels):
+            for x in range(self.mapw):
+                for y in range(self.maph):
                     if self.successors((x, y, z)):
                         val = self.checkMap(x, y, z)
                         if val == 1:

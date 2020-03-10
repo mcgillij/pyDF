@@ -1,14 +1,3 @@
-try:
-
-    import pygame
-    import sys
-    import os
-    from pygame.locals import *
-    import pprint
-except ImportError, err:
-    print "couldn't load module. %s" % (err)
-    sys.exit(2)
-
 class Job(object):
     """ Job class, generic class for a job """
     def __init__(self, name, move, dest):

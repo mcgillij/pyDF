@@ -1,7 +1,8 @@
 #! /usr/bin/env python
 
-import pygame
-from pygame.locals import KEYDOWN
+import pygame_sdl2
+pygame_sdl2.import_as_pygame()
+#from pygame.locals import KEYDOWN
 class EzMenu:
 
     def __init__(self, options):
@@ -12,7 +13,7 @@ class EzMenu:
         self.options = options
         self.x = 0
         self.y = 0
-        self.font = pygame.font.Font(None, 32)
+        self.font = pygame_sdl2.font.Font(None, 32)
         self.selected = 0
         self.width = 1
         self.color = [0, 0, 0]
@@ -42,24 +43,24 @@ class EzMenu:
             i += 1
             
     def update(self, event):
-        print str(event)
-        keymods = pygame.key.get_mods()
+        print(str(event))
+        keymods = pygame_sdl2.key.get_mods()
         """Update the menu and get input for the menu."""
-        if event.type == KEYDOWN:
-            if event.key == pygame.K_DOWN and keymods & pygame.KMOD_LALT:
-                print "This is being called"
+        if event.type == pygame_sdl2.KEYDOWN:
+            if event.key == pygame_sdl2.K_DOWN and keymods & pygame_sdl2.KMOD_LALT:
+                print("This is being called")
                 self.selected += 1
-            if event.key == pygame.K_UP and keymods & pygame.KMOD_LALT:
-                print "This is totally not being called"
+            if event.key == pygame_sdl2.K_UP and keymods & pygame_sdl2.KMOD_LALT:
+                print("This is totally not being called")
                 self.selected -= 1
-            if event.key == pygame.K_RETURN:
+            if event.key == pygame_sdl2.K_RETURN:
                 self.result(self.options[self.selected])# execute
                 #self.options[self.option][1]() # execute
         if self.selected > len(self.options) - 1:
             self.selected = 0
         if self.selected < 0:
             self.selected = len(self.options) - 1
-        print "options : " + str(len(self.options))
+        print("options : " + str(len(self.options)))
 
     def set_pos(self, x, y):
         """Set the topleft of the menu at x,y"""
@@ -83,5 +84,5 @@ class EzMenu:
         self.x = x - (self.width / 2)
         self.y = y - (self.height / 2)
     def result(self, value):
-        print value
+        print(value)
         return value

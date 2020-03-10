@@ -1,6 +1,4 @@
-import pygame
-from pygame.locals import *
-import sys, os, random
+from random import shuffle
 from math import *
 
 
@@ -15,15 +13,15 @@ class Noise(object):
         self.tilesize = float(self.width) / self.repeats
         self.tilesize /= self.tw
         self.p = []
-        for x in xrange(2 * self.tw):
+        for x in range(2 * self.tw):
             self.p.append(0)
             
         self.permutation = []
-        for value in xrange(self.tw):
+        for value in range(self.tw):
             self.permutation.append(value)
-        random.shuffle(self.permutation)
+        shuffle(self.permutation)
 
-        for i in xrange(self.tw):
+        for i in range(self.tw):
             self.p[i] = self.permutation[i]
             self.p[self.tw + i] = self.p[i]
 
@@ -83,17 +81,17 @@ class Noise(object):
         
         amplitude = 1.0
         maxamplitude = 1.0
-        mapdata = [[0 for cols in xrange(self.height)] for rows in xrange(self.width)]
-        for octave in xrange(octaves):
+        mapdata = [[0 for cols in range(self.height)] for rows in range(self.width)]
+        for octave in range(octaves):
             amplitude *= persistence
             maxamplitude += amplitude
-            for x in xrange(self.width):
-                for y in xrange(self.height):
+            for x in range(self.width):
+                for y in range(self.height):
                     sc = float(self.width) / self.tilesize
                     frequency = 1.0
                     amplitude = 1.0
                     color = 0.0
-                    for octave in xrange(octaves):
+                    for octave in range(octaves):
                         sc *= frequency
                         grey = abs(self.noise(sc * float(x) / self.width, sc * float(y) / self.height, 0.0)) #Turbulence noise in theory
                         #grey = self.noise(sc*float(x)/self.width,sc*float(y)/self.height,0.0) # regular perlin
@@ -111,10 +109,10 @@ class Noise(object):
         return mapdata
 
     def printme(self, mapdata):
-        for x in xrange(self.width):
-            for y in xrange(self.height):
-                print str(mapdata[x][y]),
-            print ''
+        for x in range(self.width):
+            for y in range(self.height):
+                print(str(mapdata[x][y]), end=' ')
+            print('')
 
 
 if __name__ == '__main__':
