@@ -129,9 +129,16 @@ class PathFinder(object):
         
         def __eq__(self, other):
             return self.coord == other.coord
-        
-        def __cmp__(self, other):
-            return cmp(self.f_cost, other.f_cost)
+
+        def __lt__(self, other):
+            return self.f_cost < other.f_cost
+
+        def __gt__(self, other):
+            return self.f_cost > other.f_cost
+        # apperantly this isn't in python 3 anymore
+        #def __cmp__(self, other):
+        #    print(f"self {self}: other: {other}")
+        #    return cmp(self.f_cost, other.f_cost)
         
         def __hash__(self):
             return hash(self.coord)

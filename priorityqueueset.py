@@ -68,6 +68,7 @@ class PriorityQueueSet(object):
         """
         if not item in self.set:
             self.set[item] = item
+            print(f"item {item}")
             heapq.heappush(self.heap, item)
             return True
         elif item < self.set[item]:

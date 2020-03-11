@@ -104,8 +104,8 @@ class engine:
         #self.keys = set()
         self.motion = None
 
-    def _recompute_path(self, map, start, end):
-        pf = PathFinder(map.successors, map.move_cost, map.move_cost)
+    def _recompute_path(self, _map, start, end):
+        pf = PathFinder(_map.successors, _map.move_cost, _map.move_cost)
         #t = time.process_time()
         pathlines = list(pf.compute_path(start, end))
 
