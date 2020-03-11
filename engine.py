@@ -1,8 +1,9 @@
 #!C:\python26\python.exe
 try:
-    import pygame
+    import pygame_sdl2
+    pygame_sdl2.import_as_pygame()
     import sys
-    from pygame.locals import *
+    #from pygame.locals import *
     from time import time
     import pickle
     from pprint import pprint
@@ -11,22 +12,22 @@ try:
     import gamemap
     from job import Job
     import math
-    import ConfigParser, os
+    import configparser, os
     import cursor
     import time
     import ezmenu
     from collections import defaultdict
     from pathfinder import PathFinder
     from intro import Intro
-except ImportError, err:
-    print "couldn't load module, %s" % (err)
+except ImportError as err:
+    print("couldn't load module, %s" % (err))
     sys.exit(2)
 
 class engine:
     def __init__(self):
         self.running = True # set the game loop good to go
-        config = ConfigParser.ConfigParser()
-        config.readfp(open('main.cfg'))
+        config = configparser.ConfigParser()
+        config.read_file(open('main.cfg'))
         self.fsw = config.getint('main', 'fullscreenwidth')
         self.fsh = config.getint('main', 'fullscreenheight')
         self.ww = config.getint('main', 'windowedwidth')
@@ -40,17 +41,17 @@ class engine:
 
         #fullscreen = False
         self.FPS = 60
-        pygame.init()
+        pygame_sdl2.init()
         #setup the default screen size
         if self.fullscreen == True:
-            self.screen = pygame.display.set_mode((self.fsw, self.fsh), FULLSCREEN)
+            self.screen = pygame_sdl2.display.set_mode((self.fsw, self.fsh), pygame_sdl2.FULLSCREEN)
         else:
-            self.screen = pygame.display.set_mode((self.ww, self.wh), RESIZABLE)
+            self.screen = pygame_sdl2.display.set_mode((self.ww, self.wh), pygame_sdl2.RESIZABLE)
 
-        pygame.display.set_caption('pyDF')
+        pygame_sdl2.display.set_caption('pyDF')
         #Intro's on by default, will need to add a config file entry for this.
         self.intro = True
-        self.mainclock = pygame.time.Clock()
+        self.mainclock = pygame_sdl2.time.Clock()
         # various rendering offsets
         self.vpRenderOffset = (self.tw, self.tw)
         self.statsOffset = (math.floor(int(0.8 * self.ww) + 2 * self.tw), self.tw)
@@ -75,16 +76,16 @@ class engine:
         self.startXTile = math.floor(int(self.vpCoordinate[0]) / self.tw)
         self.startYTile = math.floor(int(self.vpCoordinate[1]) / self.tw)
 
-        if not pygame.font.get_init():
-            pygame.font.init()
-        self.arialFnt = pygame.font.SysFont('Arial', 16)
+        if not pygame_sdl2.font.get_init():
+            pygame_sdl2.font.init()
+        self.arialFnt = pygame_sdl2.font.SysFont('Arial', 16)
         self.m = gamemap.GameMap(self.tw, self.mapw, self.maph, self.startXTile, self.startYTile, self.numXTiles, self.numYTiles)
         self.m.initMap()
         self.m.initEMap()
         self.editmode = [None, None]
         self.selectmode = False
         self.testmode = False
-        self.roomtiles = []
+        self.room_tiles = []
         self.selectcursor = cursor.Cursor(self.tw, self.m.numXTiles / 2 * self.tw, self.m.numYTiles / 2 * self.tw)
         self.queued_jobs = []
         self.mobs = []
@@ -103,45 +104,48 @@ class engine:
         #self.keys = set()
         self.motion = None
 
-    def _recompute_path(self, map, start, end):
-        pf = PathFinder(map.successors, map.move_cost, map.move_cost)
-        t = time.clock()
+    def _recompute_path(self, _map, start, end):
+        pf = PathFinder(_map.successors, _map.move_cost, _map.move_cost)
+        #t = time.process_time()
         pathlines = list(pf.compute_path(start, end))
 
-        dt = time.clock() - t
+        #dt = time.process_time() - t
         if pathlines == []:
-            print "No path found" 
+            print("No path found") 
             return pathlines
         else:
-            print "Found path (length %d)" % len(pathlines)
+            print("Found path (length %d)" % len(pathlines))
             return pathlines
         #self.path_valid = True
 
 
     def handle_events(self):
-        for event in pygame.event.get():
-            if event.type == QUIT:
+        for event in pygame_sdl2.event.get():
+            if event.type == pygame_sdl2.QUIT:
                 self.quit()
                 return
-            elif event.type == KEYDOWN:
+            elif event.type == pygame_sdl2.KEYDOWN:
                 self.handle_keyboard(event)
-            elif event.type == MOUSEBUTTONDOWN:
+            elif event.type == pygame_sdl2.MOUSEBUTTONDOWN:
                 self.buttons[event.button] = event.pos
-            elif event.type == MOUSEMOTION:
-                self.motion = event
-            elif event.type == MOUSEBUTTONUP:
+            elif event.type == pygame_sdl2.MOUSEMOTION:
+                dir(event)
+                pprint(event)
+                self.motion = event.pos
+                #self.motion = event
+            elif event.type == pygame_sdl2.MOUSEBUTTONUP:
                 del self.buttons[event.button]
-            elif event.type == VIDEORESIZE:
+            elif event.type == pygame_sdl2.VIDEORESIZE:
                 # allow for the window to be resized manually.
                 self.ww, self.wh = event.w, event.h
-                pygame.display.set_mode((self.ww, self.wh), RESIZABLE)
+                pygame_sdl2.display.set_mode((self.ww, self.wh), pygame_sdl2.RESIZABLE)
                 newwidth = math.floor(int(0.8 * self.ww) / self.tw)
                 newheight = math.floor(int(0.9 * self.wh) / self.tw)
                 self.statsOffset = (math.floor(int(0.8 * self.ww) + 2 * self.tw), self.tw)
                 self.vpDimensions = (newwidth * self.tw, newheight * self.tw) # resolution of the view port
                 self.m.numXTiles = int(math.ceil(int(self.vpDimensions[0]) / self.tw)) # the number of tiles to be shown at one time for X
                 self.m.numYTiles = int(math.ceil(int(self.vpDimensions[1]) / self.tw)) # the number of tiles to be shown at one time for y
-                self.m.tiledBG = pygame.Surface((self.m.numXTiles * self.tw, self.m.numYTiles * self.tw)).convert()
+                self.m.tiledBG = pygame_sdl2.Surface((self.m.numXTiles * self.tw, self.m.numYTiles * self.tw)).convert()
                 self.fullscreen = False
 
     def logic(self):
@@ -162,8 +166,8 @@ class engine:
     
 
     def showIntro(self):
-        myintro = Intro()
-        mytextlist = ['Welcome to PyDF',
+        intro = Intro()
+        text_list = ['Welcome to PyDF',
                       'd + mouse for digging',
                       'h + mouse for channeling',
                       'i + mouse to designate item dump',
@@ -179,16 +183,16 @@ class engine:
                       'Press any key to continue']
         hoffset = self.tw
         voffset = self.tw * 2
-        for item in mytextlist:
-            myintro.drawText(item, self.screen, hoffset, voffset)
+        for item in text_list:
+            intro.drawText(item, self.screen, hoffset, voffset)
             voffset += self.tw * 2
                         
-        pygame.display.update()
-        myintro.waitForKey()
+        pygame_sdl2.display.update()
+        intro.waitForKey()
         self.intro = False
 
     def cleanup(self):
-        pygame.quit()
+        pygame_sdl2.quit()
 
     def quit(self):
         self.running = False
@@ -242,8 +246,8 @@ class engine:
                 dest = queue.pop(0)
                 #if self.m.checkEMapQueue(dest[0], dest[1], dest[2]) == True:
                 #   continue
-                list = self.m.successors(dest)
-                for move in list:
+                list_of_moves = self.m.successors(dest)
+                for move in list_of_moves:
                     if len(self.m.successors(move)):
                         #dest[2] = dest[2] -1 #channel digs a zlevel below but creates a ramp
                         self.m.writeEMapQueue(dest[0], dest[1], dest[2], True)
@@ -251,7 +255,7 @@ class engine:
                         continue
     def mining(self):
         selected = self.m.get_selected(2)
-        print "Selected: ", selected
+        print("Selected: ", selected)
         for coord in selected: # change this at some point
             # checking if the neighboring tiles are accessible from 1 tile away in every direction
             # would have to make this more intelligent in the future, but it works for now.
@@ -277,24 +281,24 @@ class engine:
             dest = queue.pop(0)
             #if self.m.checkEMapQueue(dest[0], dest[1], dest[2]) == True:
             #   continue 
-            list = self.m.successors(dest)
-            for move in list:
+            list_of_moves = self.m.successors(dest)
+            for move in list_of_moves:
                 if len(self.m.successors(move)):
                     return Job('Mining', move, dest)
         return None
 
     def expand_selection(self, coord):
         pprint(coord)
-        list = self.m.successors(coord)
-        for item in list:
-            if item in self.roomtiles:
-                print "already in list"
+        list_selection = self.m.successors(coord)
+        for item in list_selection:
+            if item in self.room_tiles:
+                print("already in list")
             else:
-                self.roomtiles.append(item)
+                self.room_tiles.append(item)
 
-    def menu(self, list):
+    def menu(self, menu_list):
         if self.showmenu == False:
-            self.currentmenu = ezmenu.EzMenu(list)
+            self.currentmenu = ezmenu.EzMenu(menu_list)
             self.currentmenu.set_pos(self.menuOffset3[0], self.menuOffset3[1])
             self.currentmenu.set_font(self.arialFnt)
             self.currentmenu.set_highlight_color((0, 255, 0))
@@ -302,7 +306,7 @@ class engine:
         self.showmenu = True
 
     def handle_keyboard(self, event):
-        keymods = pygame.key.get_mods()
+        keymods = pygame_sdl2.key.get_mods()
         if event.key == ord('k'): # and self.selectmode == False:
             self.paused = True
             if self.selectmode == False:
@@ -346,145 +350,153 @@ class engine:
                 pprint (self.testmode)
                 self.testmode = True
             else:
-                print "testing"
+                print("testing")
                 pprint (self.testmode)
                 self.testmode = False
-                self.roomtiles = []
+                self.room_tiles = []
 
         elif event.key == ord('n') and self.testmode == True and self.selectmode == True:
             mapx = (self.selectcursor.position[0] + self.vpCoordinate[0]) / self.tw
             mapy = (self.selectcursor.position[1] + self.vpCoordinate[1]) / self.tw 
-            if self.roomtiles == []:
+            if self.room_tiles == []:
                 self.expand_selection((mapx, mapy, self.currentZlevel))
             else:
-                list = self.roomtiles
-                for item in list:
+                room_list = self.room_tiles
+                for item in room_list:
                     self.expand_selection((item[0], item[1], self.currentZlevel))
 
-            pprint(self.roomtiles)
+            pprint(self.room_tiles)
         elif event.key == ord('m') and self.testmode == True and self.selectmode == True:
-            print "Decreasing"
+            print("Decreasing")
             
-        elif event.key == K_ESCAPE: 
+        elif event.key == pygame_sdl2.K_ESCAPE: 
             self.quit()
-        elif event.key == K_SPACE:
+        elif event.key == pygame_sdl2.K_SPACE:
             #print "PAUSING OR UNPAUSING"
             self.pausegame()
 
         #move the menu selector:
-        elif (event.key == K_UP or event.key == K_DOWN) and (keymods & pygame.KMOD_LALT and self.showmenu == True and self.currentmenu != None):
+        elif (event.key == pygame_sdl2.K_UP or event.key == pygame_sdl2.K_DOWN) and (keymods & pygame_sdl2.KMOD_LALT and self.showmenu == True and self.currentmenu != None):
             self.currentmenu.update(event)
-        elif event.key == K_RETURN and self.showmenu == True and self.currentmenu != None and self.selectmode == True:
+        elif event.key == pygame_sdl2.K_RETURN and self.showmenu == True and self.currentmenu != None and self.selectmode == True:
             self.currentmenu.update(event)
 
         #Movement Keys l,r,u,d
         #Cursor Movement
 
-        elif event.key == K_LEFT and self.selectmode == True:
-            if keymods & pygame.KMOD_LSHIFT:
+        elif event.key == pygame_sdl2.K_LEFT and self.selectmode == True:
+            if keymods & pygame_sdl2.KMOD_LSHIFT:
                 self.selectcursor.position[0] = self.selectcursor.position[0] - self.vpShiftStep
             else:
                 self.selectcursor.position[0] = self.selectcursor.position[0] - self.vpStep
 
-        elif event.key == K_RIGHT and self.selectmode == True:
-            if keymods & pygame.KMOD_LSHIFT:
+        elif event.key == pygame_sdl2.K_RIGHT and self.selectmode == True:
+            if keymods & pygame_sdl2.KMOD_LSHIFT:
                 self.selectcursor.position[0] = self.selectcursor.position[0] + self.vpShiftStep
             else:
                 self.selectcursor.position[0] = self.selectcursor.position[0] + self.vpStep
 
-        elif event.key == K_UP and self.selectmode == True and self.testmode == False:
-            if keymods & pygame.KMOD_LSHIFT:
+        elif event.key == pygame_sdl2.K_UP and self.selectmode == True and self.testmode == False:
+            if keymods & pygame_sdl2.KMOD_LSHIFT:
                 self.selectcursor.position[1] = self.selectcursor.position[1] - self.vpShiftStep
             else:
                 self.selectcursor.position[1] = self.selectcursor.position[1] - self.vpStep
 
-        elif event.key == K_DOWN and self.selectmode == True and self.testmode == False:
-            if keymods & pygame.KMOD_LSHIFT:
+        elif event.key == pygame_sdl2.K_DOWN and self.selectmode == True and self.testmode == False:
+            if keymods & pygame_sdl2.KMOD_LSHIFT:
                 self.selectcursor.position[1] = self.selectcursor.position[1] + self.vpShiftStep
             else:
                 self.selectcursor.position[1] = self.selectcursor.position[1] + self.vpStep
 
         #move up and down zlevels.
-        elif event.key == K_COMMA and self.selectmode == False and keymods & pygame.KMOD_LSHIFT:
-            if self.currentZlevel + 1 in xrange(self.m.zlevels):
+        elif event.key == pygame_sdl2.K_COMMA and self.selectmode == False and keymods & pygame_sdl2.KMOD_LSHIFT:
+            if self.currentZlevel + 1 in range(self.m.zlevels):
                 self.currentZlevel = self.currentZlevel + 1
-        elif event.key == K_PERIOD and self.selectmode == False and keymods & pygame.KMOD_LSHIFT:
-            if self.currentZlevel - 1 in xrange(self.m.zlevels):
+        elif event.key == pygame_sdl2.K_PERIOD and self.selectmode == False and keymods & pygame_sdl2.KMOD_LSHIFT:
+            if self.currentZlevel - 1 in range(self.m.zlevels):
                 self.currentZlevel = self.currentZlevel - 1
 
         #View port Movement        
-        elif event.key == K_LEFT and self.selectmode == False:
-            if keymods & pygame.KMOD_LSHIFT:
+        elif event.key == pygame_sdl2.K_LEFT and self.selectmode == False:
+            if keymods & pygame_sdl2.KMOD_LSHIFT:
                 self.vpCoordinate[0] = self.vpCoordinate[0] - self.vpShiftStep
             else:
                 self.vpCoordinate[0] = self.vpCoordinate[0] - self.vpStep
 
-        elif event.key == K_RIGHT and self.selectmode == False:
-            if keymods & pygame.KMOD_LSHIFT:
+        elif event.key == pygame_sdl2.K_RIGHT and self.selectmode == False:
+            if keymods & pygame_sdl2.KMOD_LSHIFT:
                 self.vpCoordinate[0] = self.vpCoordinate[0] + self.vpShiftStep
             else:
                 self.vpCoordinate[0] = self.vpCoordinate[0] + self.vpStep
 
-        elif event.key == K_UP and self.selectmode == False:
-            if keymods & pygame.KMOD_LSHIFT:
+        elif event.key == pygame_sdl2.K_UP and self.selectmode == False:
+            if keymods & pygame_sdl2.KMOD_LSHIFT:
                 self.vpCoordinate[1] = self.vpCoordinate[1] - self.vpShiftStep
             else:
                 self.vpCoordinate[1] = self.vpCoordinate[1] - self.vpStep
-        elif event.key == K_DOWN and self.selectmode == False:
-            if keymods & pygame.KMOD_LSHIFT:
+        elif event.key == pygame_sdl2.K_DOWN and self.selectmode == False:
+            if keymods & pygame_sdl2.KMOD_LSHIFT:
                 self.vpCoordinate[1] = self.vpCoordinate[1] + self.vpShiftStep
             else:
                 self.vpCoordinate[1] = self.vpCoordinate[1] + self.vpStep
 
         #reset viewport 
-        elif event.key == K_F11 :
+        elif event.key == pygame_sdl2.K_F11 :
             if self.fullscreen == False:
-                pygame.display.set_mode((self.fsw, self.fsh), FULLSCREEN, 32)
+                pygame_sdl2.display.set_mode((self.fsw, self.fsh), pygame_sdl2.FULLSCREEN, 32)
                 newwidth = math.floor(int(0.8 * self.fsw) / self.tw)
                 newheight = math.floor(int(0.9 * self.fsh) / self.tw)
                 self.statsOffset = (math.floor(int(0.8 * self.fsw) + 2 * self.tw), self.tw)
                 self.vpDimensions = (newwidth * self.tw, newheight * self.tw) # resolution of the view port
                 self.m.numXTiles = int(math.ceil(int(self.vpDimensions[0]) / self.tw)) # tiles to be shown at one time for X
                 self.m.numYTiles = int(math.ceil(int(self.vpDimensions[1]) / self.tw)) # tiles to be shown at one time for y
-                self.m.tiledBG = pygame.Surface((self.m.numXTiles * self.tw, self.m.numYTiles * self.tw)).convert()
+                self.m.tiledBG = pygame_sdl2.Surface((self.m.numXTiles * self.tw, self.m.numYTiles * self.tw)).convert()
                 self.fullscreen = True
             elif self.fullscreen == True:
-                pygame.display.set_mode((self.ww, self.wh), RESIZABLE)
+                pygame_sdl2.display.set_mode((self.ww, self.wh), pygame_sdl2.RESIZABLE)
                 newwidth = math.floor(int(0.8 * self.ww) / self.tw)
                 newheight = math.floor(int(0.9 * self.wh) / self.tw)
                 self.statsOffset = (math.floor(int(0.8 * self.ww) + 2 * self.tw), self.tw)
                 self.vpDimensions = (newwidth * self.tw, newheight * self.tw) # resolution of the view port
                 self.m.numXTiles = int(math.ceil(int(self.vpDimensions[0]) / self.tw)) # tiles to be shown at one time for X
                 self.m.numYTiles = int(math.ceil(int(self.vpDimensions[1]) / self.tw)) # tiles to be shown at one time for y
-                self.m.tiledBG = pygame.Surface((self.m.numXTiles * self.tw, self.m.numYTiles * self.tw)).convert()
+                self.m.tiledBG = pygame_sdl2.Surface((self.m.numXTiles * self.tw, self.m.numYTiles * self.tw)).convert()
                 self.fullscreen = False
 
     def handle_mouse(self):
-        if 1 in self.buttons and self.editmode[0] == 'designate' and self.editmode[1] == 'itemselect':
-            mx = self.motion.pos[0]
-            my = self.motion.pos[1]
+        MOUSE_BUTTON_ONE = 1
+        pprint(f"mousemotion: {pygame_sdl2.MOUSEMOTION}")
+        pprint(f"self.motion: {self.motion}")
+        if MOUSE_BUTTON_ONE in self.buttons and self.editmode[0] == 'designate' and self.editmode[1] == 'itemselect':
+            mx, my = pygame_sdl2.mouse.get_pos()
+            #mx = self.motion.pos[0]
+            #my = self.motion.pos[1]
             if mx < self.m.numXTiles * self.tw + self.vpRenderOffset[0] and my < self.m.numYTiles * self.tw + self.vpRenderOffset[1]: #within the map viewport
                 self.m.select_items((mx - self.vpRenderOffset[0] + self.vpCoordinate[0]) / self.tw, (my - self.vpRenderOffset[1] + self.vpCoordinate[1]) / self.tw, self.currentZlevel)    
 
          # drop point for items
-        if 1 in self.buttons and self.editmode[0] == 'designate' and self.editmode[1] == 'drop':
-            mx = self.motion.pos[0]
-            my = self.motion.pos[1]
+        if MOUSE_BUTTON_ONE in self.buttons and self.editmode[0] == 'designate' and self.editmode[1] == 'drop':
+            mx, my = pygame_sdl2.mouse.get_pos()
+            #mx = self.motion.pos[0]
+            #my = self.motion.pos[1]
             if mx < self.m.numXTiles * self.tw + self.vpRenderOffset[0] and my < self.m.numYTiles * self.tw + self.vpRenderOffset[1]: #within the map viewport
                 self.m.updateEMap((mx - self.vpRenderOffset[0] + self.vpCoordinate[0]) / self.tw, (my - self.vpRenderOffset[1] + self.vpCoordinate[1]) / self.tw, self.currentZlevel, self.editmode)
 
 
-        if 1 in self.buttons and self.editmode[0] == 'designate':
-            mx = self.motion.pos[0]
-            my = self.motion.pos[1]
+        if MOUSE_BUTTON_ONE in self.buttons and self.editmode[0] == 'designate':
+            mx, my = pygame_sdl2.mouse.get_pos()
+            #mx = self.motion.pos[0]
+            #my = self.motion.pos[1]
             if mx < self.m.numXTiles * self.tw + self.vpRenderOffset[0] and my < self.m.numYTiles * self.tw + self.vpRenderOffset[1]: #within the map viewport
                 self.m.updateEMap((mx - self.vpRenderOffset[0] + self.vpCoordinate[0]) / self.tw, (my - self.vpRenderOffset[1] + self.vpCoordinate[1]) / self.tw, self.currentZlevel, self.editmode)
 
-        if self.motion == MOUSEMOTION and 1 in self.buttons and self.editmode[0] == "designate":
-            mx = self.motion.pos[0]
-            my = self.motion.pos[1]
-            if mx < self.m.numXTiles * self.tw + self.vpRenderOffset[0] and my < self.m.numYTiles * self.tw + self.vpRenderOffset[1]: #within the map viewport
-                self.m.updateEMap((mx - self.vpRenderOffset[0] + self.vpCoordinate[0]) / self.tw, (my - self.vpRenderOffset[1] + self.vpCoordinate[1]) / self.tw, self.currentZlevel, self.editmode)
+        #if MOUSE_BUTTON_ONE in self.buttons and self.editmode[0] == "designate":
+     #   if MOUSE_BUTTON_ONE in self.buttons and self.motion == pygame_sdl2.MOUSEMOTION.pos and self.editmode[0] == "designate":
+     #        mx = self.motion.pos[0]
+     #       my = self.motion.pos[1]
+     #       if mx < self.m.numXTiles * self.tw + self.vpRenderOffset[0] and my < self.m.numYTiles * self.tw + self.vpRenderOffset[1]: #within the map viewport
+     #           self.m.updateEMap((mx - self.vpRenderOffset[0] + self.vpCoordinate[0]) / self.tw, (my - self.vpRenderOffset[1] + self.vpCoordinate[1]) / self.tw, self.currentZlevel, self.editmode)
+
 
     def handle_viewport(self):
         #Restrict Cursor Movement.   
@@ -557,7 +569,7 @@ class engine:
                 self.moveMob(move[0], move[1], move[2], mob)
             else:
                 if mob.job:
-                    print "No pathlines, attempting to snag some"
+                    print("No pathlines, attempting to snag some")
                     path = self._recompute_path(self.m, mob.position, mob.job.move)
                     #pprint(path)
                     if path != []:
@@ -598,8 +610,8 @@ class engine:
                             mob.job = Job('DropItem', mob.job.dest[0], mob.job.dest[0])
                             mob.pathlines = self._recompute_path(self.m, mob.position, mob.dest)
                         else:
-                            print "Job Canceled, no items left"
-                            print "SHOULD NOT GET HERE"
+                            print("Job Canceled, no items left")
+                            print("SHOULD NOT GET HERE")
                             #mob.job = None #.clearjob()
                     elif mo.job.name == "DropItem":
                         #print "Dropping Item"
@@ -633,8 +645,8 @@ class engine:
         # Cursor
         if self.selectmode == True:
             self.finalmap.blit(self.selectcursor.image, self.selectcursor.position)
-            if self.testmode == True and self.roomtiles:
-                for pos in self.roomtiles:
+            if self.testmode == True and self.room_tiles:
+                for pos in self.room_tiles:
                     self.finalmap.blit(self.selectcursor.image, [pos[0] * self.tw + self.vpCoordinate[0], pos[1] * self.tw + self.vpCoordinate[1]])
             self.screen.blit(self.arialFnt.render('value: ' + str(self.mapvalue), True, self.white), self.menuOffset)
             self.screen.blit(self.arialFnt.render('content: ' + str(self.tilecontent), True, self.white), self.menuOffset2)
@@ -654,7 +666,7 @@ class engine:
     
         self.mainclock.tick(self.FPS)
         #pygame.display.update()
-        pygame.display.flip()
+        pygame_sdl2.display.flip()
     
     def run(self):
         if self.intro == True:

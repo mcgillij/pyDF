@@ -2,8 +2,8 @@
 try:
     import sys
     from engine import engine
-except ImportError, err:
-    print "couldn't load module, %s" % (err)
+except ImportError as err:
+    print("couldn't load module, %s" % (err))
     sys.exit(2)
 
 # giver
