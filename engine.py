@@ -131,7 +131,7 @@ class engine:
             elif event.type == pygame_sdl2.MOUSEMOTION:
                 dir(event)
                 pprint(event)
-                self.motion = event
+                self.motion = event.pos
                 #self.motion = event
             elif event.type == pygame_sdl2.MOUSEBUTTONUP:
                 del self.buttons[event.button]
@@ -465,35 +465,37 @@ class engine:
 
     def handle_mouse(self):
         MOUSE_BUTTON_ONE = 1
-        pprint(f"buttons: {self.buttons}")
         pprint(f"mousemotion: {pygame_sdl2.MOUSEMOTION}")
         pprint(f"self.motion: {self.motion}")
         if MOUSE_BUTTON_ONE in self.buttons and self.editmode[0] == 'designate' and self.editmode[1] == 'itemselect':
-            mx = self.motion.pos[0]
-            my = self.motion.pos[1]
+            mx, my = pygame_sdl2.mouse.get_pos()
+            #mx = self.motion.pos[0]
+            #my = self.motion.pos[1]
             if mx < self.m.numXTiles * self.tw + self.vpRenderOffset[0] and my < self.m.numYTiles * self.tw + self.vpRenderOffset[1]: #within the map viewport
                 self.m.select_items((mx - self.vpRenderOffset[0] + self.vpCoordinate[0]) / self.tw, (my - self.vpRenderOffset[1] + self.vpCoordinate[1]) / self.tw, self.currentZlevel)    
 
          # drop point for items
         if MOUSE_BUTTON_ONE in self.buttons and self.editmode[0] == 'designate' and self.editmode[1] == 'drop':
-            mx = self.motion.pos[0]
-            my = self.motion.pos[1]
+            mx, my = pygame_sdl2.mouse.get_pos()
+            #mx = self.motion.pos[0]
+            #my = self.motion.pos[1]
             if mx < self.m.numXTiles * self.tw + self.vpRenderOffset[0] and my < self.m.numYTiles * self.tw + self.vpRenderOffset[1]: #within the map viewport
                 self.m.updateEMap((mx - self.vpRenderOffset[0] + self.vpCoordinate[0]) / self.tw, (my - self.vpRenderOffset[1] + self.vpCoordinate[1]) / self.tw, self.currentZlevel, self.editmode)
 
 
         if MOUSE_BUTTON_ONE in self.buttons and self.editmode[0] == 'designate':
-            mx = self.motion.pos[0]
-            my = self.motion.pos[1]
+            mx, my = pygame_sdl2.mouse.get_pos()
+            #mx = self.motion.pos[0]
+            #my = self.motion.pos[1]
             if mx < self.m.numXTiles * self.tw + self.vpRenderOffset[0] and my < self.m.numYTiles * self.tw + self.vpRenderOffset[1]: #within the map viewport
                 self.m.updateEMap((mx - self.vpRenderOffset[0] + self.vpCoordinate[0]) / self.tw, (my - self.vpRenderOffset[1] + self.vpCoordinate[1]) / self.tw, self.currentZlevel, self.editmode)
 
         #if MOUSE_BUTTON_ONE in self.buttons and self.editmode[0] == "designate":
-        if MOUSE_BUTTON_ONE in self.buttons and self.motion == pygame_sdl2.MOUSEMOTION and self.editmode[0] == "designate":
-            mx = self.motion.pos[0]
-            my = self.motion.pos[1]
-            if mx < self.m.numXTiles * self.tw + self.vpRenderOffset[0] and my < self.m.numYTiles * self.tw + self.vpRenderOffset[1]: #within the map viewport
-                self.m.updateEMap((mx - self.vpRenderOffset[0] + self.vpCoordinate[0]) / self.tw, (my - self.vpRenderOffset[1] + self.vpCoordinate[1]) / self.tw, self.currentZlevel, self.editmode)
+     #   if MOUSE_BUTTON_ONE in self.buttons and self.motion == pygame_sdl2.MOUSEMOTION.pos and self.editmode[0] == "designate":
+     #        mx = self.motion.pos[0]
+     #       my = self.motion.pos[1]
+     #       if mx < self.m.numXTiles * self.tw + self.vpRenderOffset[0] and my < self.m.numYTiles * self.tw + self.vpRenderOffset[1]: #within the map viewport
+     #           self.m.updateEMap((mx - self.vpRenderOffset[0] + self.vpCoordinate[0]) / self.tw, (my - self.vpRenderOffset[1] + self.vpCoordinate[1]) / self.tw, self.currentZlevel, self.editmode)
 
 
     def handle_viewport(self):
