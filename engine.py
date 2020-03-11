@@ -106,10 +106,10 @@ class engine:
 
     def _recompute_path(self, map, start, end):
         pf = PathFinder(map.successors, map.move_cost, map.move_cost)
-        t = time.process_time()
+        #t = time.process_time()
         pathlines = list(pf.compute_path(start, end))
 
-        dt = time.process_time() - t
+        #dt = time.process_time() - t
         if pathlines == []:
             print("No path found") 
             return pathlines
@@ -129,7 +129,10 @@ class engine:
             elif event.type == pygame_sdl2.MOUSEBUTTONDOWN:
                 self.buttons[event.button] = event.pos
             elif event.type == pygame_sdl2.MOUSEMOTION:
+                dir(event)
+                pprint(event)
                 self.motion = event
+                #self.motion = event
             elif event.type == pygame_sdl2.MOUSEBUTTONUP:
                 del self.buttons[event.button]
             elif event.type == pygame_sdl2.VIDEORESIZE:
