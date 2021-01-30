@@ -4,8 +4,10 @@ except ImportError as err:
     print("couldn't load module. %s" % (err))
     sys.exit(2)
 
-class MapTile():
+
+class MapTile:
     """ MapTile class, generic class for a tile """
+
     def __init__(self, value):
         self.value = value
         self.content = []
@@ -18,8 +20,7 @@ class MapTile():
     def digTile(self, value):
         oldvalue = self.value
         self.value = value
-        self.add(Item('crumbledwall', 16))
-
+        self.add(Item("crumbledwall", 16))
 
     def addMob(self, mob):
         self.mobs.append(mob)
