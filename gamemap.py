@@ -1,17 +1,16 @@
 try:
     import pygame
-    from time import time
+#    from time import time
     import pickle
-    from pprint import pprint
+#    from pprint import pprint
     import loader
-    import mob
     import random
     from math import sqrt
-    import configparser, os
+    import configparser
     import maptile
     import noise
     import selected
-    from collections import defaultdict
+    import sys
 except ImportError as err:
     print("couldn't load module, %s" % (err))
     sys.exit(2)
@@ -45,7 +44,7 @@ class GameMap(object):
         self.mapdata = [
             [[0 for cols in range(self.maph)] for rows in range(self.mapw)]
             for z in range(self.zlevels)
-        ]  #          [row for row in xrange(self.zlevels)]
+        ]  # [row for row in xrange(self.zlevels)]
         self.emapdata = [row for row in range(self.zlevels)]
         # ["wall1x32.png", "grassx32.png", "grass2x32.png", "grass3x32.png", "grass4x32.png", "waterx32.png", "magmax32.png", 'uprampx32.png', 'downrampx32.png']
         self.tileimages = []
@@ -130,8 +129,8 @@ class GameMap(object):
             for y in range(int(self.startYTile), int(self.startYTile + self.numYTiles)):
                 val = self.checkEMap(x, y, zlevel)
                 for z in self.mapdata[zlevel][x][y].content:
-                    if z != None:
-                        if z.selected == True:
+                    if z is not None:
+                        if z.selected:
                             self.tiledBG.blit(
                                 z.image,
                                 (
@@ -191,7 +190,7 @@ class GameMap(object):
                     ((x - self.startXTile) * self.tw, (y - self.startYTile) * self.tw),
                 )
                 for z in self.mapdata[zlevel][x][y].content:
-                    if z != None:
+                    if z is not None:
                         self.tiledBG.blit(
                             z.image,
                             (
@@ -294,22 +293,22 @@ class GameMap(object):
     def get_items_in_queue(self, x, y, z):
         content = self.checkMapContent(x, y, z)
         for item in content:
-            if item.inqueue == True:
+            if item.inqueue:
                 return item
         return None
 
     def get_items(self, x, y, z):
         val = self.checkMapContent(x, y, z)
-        if val == None:
+        if val is None:
             return None
         else:
             return val
 
     def select_items(self, x, y, z):
         val = self.checkMapContent(x, y, z)
-        if val != None:
+        if val is not None:
             for item in val:
-                if item.inqueue == False:
+                if not item.inqueue:
                     item.selected = True
         else:
             return None
@@ -322,9 +321,9 @@ class GameMap(object):
                     int(self.startYTile), int(self.startYTile + self.numYTiles)
                 ):
                     val = self.checkMapContent(x, y, z)
-                    if val != None:
+                    if val is not None:
                         for item in val:
-                            if item.selected == True and item.inqueue == False:
+                            if item.selected and not item.inqueue:
                                 selected.append((x, y, z))
         return selected
 
@@ -372,7 +371,7 @@ class GameMap(object):
                 tileblocked = self.mapdata[calc_z][newrow][newcol].blocked
                 if (
                     0 <= newrow <= self.mapw - 1 and 0 <= newcol <= self.maph - 1
-                ) and tileblocked == False:
+                ) and not tileblocked:
                     slist.append((newrow, newcol, calc_z))  # fire the move in the queue
                     if (
                         tilevalue == 7

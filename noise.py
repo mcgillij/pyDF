@@ -1,5 +1,5 @@
 from random import shuffle
-from math import *
+# from math import *
 
 
 class Noise(object):

@@ -1,8 +1,10 @@
+""" Cursor class """
 try:
     from loader import load_png
-    import configparser, os
+    import configparser
 except ImportError as err:
     print("couldn't load module. %s" % (err))
+    import sys
     sys.exit(2)
 
 

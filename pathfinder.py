@@ -1,7 +1,7 @@
 from priorityqueueset import PriorityQueueSet
 
 
-class PathFinder(object):
+class PathFinder:
     """Computes a path in a graph using the A* algorithm.
 
     Initialize the object and then repeatedly compute_path to
@@ -83,7 +83,7 @@ class PathFinder(object):
 
         return []
 
-    ########################## PRIVATE ##########################
+# PRIVATE
 
     def _compute_g_cost(self, from_node, to_node):
         return from_node.g_cost + self.move_cost(from_node.coord, to_node.coord)
