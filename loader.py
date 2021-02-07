@@ -1,6 +1,6 @@
 try:
     import pygame
-    import random, sys
+    import sys
     import os
 except ImportError as err:
     print("couldn't load module. %s" % (err))
@@ -13,7 +13,7 @@ def load_font(name, size):
     try:
         font = pygame.font.Font(fullname, size)
     except pygame.error as message:
-        print("Cannot load font file: ", fullname)
+        print(f"Cannot load font file: {fullname}, error: {message}")
     else:
         font = pygame.font.SysFont(None, size)
     return font

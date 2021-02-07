@@ -1,4 +1,5 @@
 try:
+    import sys
     from item import Item
 except ImportError as err:
     print("couldn't load module. %s" % (err))
@@ -18,7 +19,6 @@ class MapTile:
             self.blocked = False
 
     def digTile(self, value):
-        oldvalue = self.value
         self.value = value
         self.add(Item("crumbledwall", 16))
 
@@ -40,7 +40,7 @@ class MapTile:
 
     def pickup(self):
         for item in self.content:
-            if item.selected == True:
+            if item.selected:
                 val = item
                 self.remove(item)
                 return val

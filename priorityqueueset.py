@@ -1,7 +1,7 @@
 import heapq
 
 
-class PriorityQueueSet(object):
+class PriorityQueueSet:
     """Combined priority queue and set data structure. Acts like
     a priority queue, except that its items are guaranteed to
     be unique.
@@ -64,9 +64,9 @@ class PriorityQueueSet(object):
         (i.e. lower), the priority of the existing item in the
         queue will be updated.
 
-        Returns True iff the item was added or updated.
+        Returns True if the item was added or updated.
         """
-        if not item in self.set:
+        if item not in self.set:
             self.set[item] = item
             print(f"item {item}")
             heapq.heappush(self.heap, item)

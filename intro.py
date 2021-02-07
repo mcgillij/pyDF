@@ -7,9 +7,11 @@ except ImportError as err:
     sys.exit(2)
 
 
-class Intro(object):
+class Intro:
     """This will probably be adjusted to be usable for any text screen
     but for now I will use it just for the intro / instructions screen"""
+
+    running = True
 
     def __init__(self):
         self.title = "PyDF"
@@ -25,14 +27,13 @@ class Intro(object):
         surface.blit(textobj, textrect)
 
     def waitForKey(self):
-        running = True
         while True:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    running = False
+                    self.running = False
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:  # pressing escape quits
-                        running = False
+                        self.running = False
                     return
 
 

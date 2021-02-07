@@ -1,12 +1,11 @@
 try:
     import pygame
     import sys
-    import os
 
-    from time import time
-    import pprint
+#    from time import time
+#    import pprint
     from loader import load_png
-    import configparser, os
+    import configparser
 except ImportError as err:
     print("couldn't load module. %s" % (err))
     sys.exit(2)
