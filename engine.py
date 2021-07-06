@@ -5,6 +5,7 @@ try:
     import sys
 
     import pygame.locals
+
     # from time import time
     import mob
     import gamemap
@@ -22,6 +23,7 @@ except ImportError as err:
 
 class Engine:
     """ Main Engine class """
+
     def __init__(self):
         self.running = True  # set the game loop good to go
         config = configparser.ConfigParser()
@@ -151,7 +153,7 @@ class Engine:
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 self.buttons[event.button] = event.pos
             elif event.type == pygame.MOUSEMOTION:
-                dir(event)
+                #                dir(event)
                 # pprint(event)
                 self.motion = event.pos
                 # self.motion = event
@@ -194,7 +196,7 @@ class Engine:
             self.channel()
             self.moveitem()
             # process the queue
-#            pprint(self.queued_jobs)
+            # print(self.queued_jobs)
             self.move_mobs()
             self.mob_logic()
             self.handle_logic()
@@ -282,8 +284,8 @@ class Engine:
                 queue.append(coord)
             if len(queue):
                 dest = queue.pop(0)
-                # if self.m.checkEMapQueue(dest[0], dest[1], dest[2]) == True:
-                #   continue
+                # if self.m.checkEMapQueue(dest[0], dest[1], dest[2]) is True:
+                #    continue
                 list_of_moves = self.m.successors(dest)
                 for move in list_of_moves:
                     if len(self.m.successors(move)):
@@ -331,7 +333,6 @@ class Engine:
         return None
 
     def expand_selection(self, coord):
-        # pprint(coord)
         list_selection = self.m.successors(coord)
         for item in list_selection:
             if item in self.room_tiles:
@@ -360,47 +361,43 @@ class Engine:
 
         elif event.key == ord("d"):
             self.paused = True
-            # print "mining"
+            # mining
             self.editmode = ["designate", "mining"]
         elif event.key == ord("h"):
             self.paused = True
-            # print "channeling"
+            # channeling
             self.editmode = ["designate", "channel"]
         elif event.key == ord("i"):
             self.paused = True
-            # print "Item Drop location"
+            # Item Drop location
             self.editmode = ["designate", "drop"]
         elif event.key == ord("o"):
             self.paused = True
-            # print "select items to move"
+            # select items to move
             self.editmode = ["designate", "itemselect"]
         elif event.key == ord("x"):
             self.paused = True
-            # print "REMOVE MODE"
+            # REMOVE MODE
             self.editmode[1] = "remove"
         elif event.key == ord("l"):
             self.paused = True
-            # print "Loading map"
+            # Loading map
             self.m.load_map()
         elif event.key == ord("s"):
             self.paused = True
-            # print "Saving map"
+            # Saving map
             self.m.save_map()
         elif event.key == ord("t"):
             self.paused = True
-            # print "Testing "
+            # Testing
             if not self.testmode:
-                #  pprint(self.testmode)
                 self.testmode = True
             else:
                 print("testing")
-            #    pprint(self.testmode)
                 self.testmode = False
                 self.room_tiles = []
 
-        elif (
-            event.key == ord("n") and self.testmode and self.selectmode
-        ):
+        elif event.key == ord("n") and self.testmode and self.selectmode:
             mapx = (self.selectcursor.position[0] + self.vpCoordinate[0]) / self.tw
             mapy = (self.selectcursor.position[1] + self.vpCoordinate[1]) / self.tw
             if self.room_tiles == []:
@@ -410,16 +407,13 @@ class Engine:
                 for item in room_list:
                     self.expand_selection((item[0], item[1], self.currentZlevel))
 
-            #  pprint(self.room_tiles)
-        elif (
-            event.key == ord("m") and self.testmode and self.selectmode
-        ):
+        elif event.key == ord("m") and self.testmode and self.selectmode:
             print("Decreasing")
 
         elif event.key == pygame.K_ESCAPE:
             self.quit()
         elif event.key == pygame.K_SPACE:
-            # print "PAUSING OR UNPAUSING"
+            # PAUSING OR UNPAUSE
             self.pausegame()
 
         # move the menu selector:
@@ -460,11 +454,7 @@ class Engine:
                     self.selectcursor.position[0] + self.vpStep
                 )
 
-        elif (
-            event.key == pygame.K_UP
-            and self.selectmode
-            and not self.testmode
-        ):
+        elif event.key == pygame.K_UP and self.selectmode and not self.testmode:
             if keymods & pygame.KMOD_LSHIFT:
                 self.selectcursor.position[1] = (
                     self.selectcursor.position[1] - self.vpShiftStep
@@ -474,11 +464,7 @@ class Engine:
                     self.selectcursor.position[1] - self.vpStep
                 )
 
-        elif (
-            event.key == pygame.K_DOWN
-            and self.selectmode
-            and not self.testmode
-        ):
+        elif event.key == pygame.K_DOWN and self.selectmode and not self.testmode:
             if keymods & pygame.KMOD_LSHIFT:
                 self.selectcursor.position[1] = (
                     self.selectcursor.position[1] + self.vpShiftStep
@@ -577,8 +563,6 @@ class Engine:
 
     def handle_mouse(self):
         MOUSE_BUTTON_ONE = 1
-#        pprint(f"mousemotion: {pygame.MOUSEMOTION}")
-#        pprint(f"self.motion: {self.motion}")
         if (
             MOUSE_BUTTON_ONE in self.buttons
             and self.editmode[0] == "designate"
@@ -707,33 +691,31 @@ class Engine:
         counter = 0
         for mo in self.mobs:
             if mo.job is None:
-                #   print "+1 idler"
                 counter = counter + 1
         return counter
 
     def move_mobs(self):
         for m in self.mobs:
             if len(m.pathlines) > 0:
-                # print "Has a path, walking 1 step of the path"
+                print("Has a path, walking 1 step of the path")
                 move = m.pathlines.pop(0)
                 self.moveMob(move[0], move[1], move[2], m)
             else:
                 if m.job:
                     print("No pathlines, attempting to snag some")
                     path = self._recompute_path(self.m, m.position, m.job.move)
-                    # pprint(path)
                     if path != []:
-                        # print "path found"
-                        mob.pathlines = path
+                        print("path found")
+                        m.pathlines = path
                     else:
-                        mob.job = None
+                        m.job = None
 
     def mob_logic(self):
         for m in self.mobs:
             if m.job is not None:
                 if m.position == m.job.move:
                     if m.job.name == "Channeling":
-                        # print "Channeling..."
+                        # Channeling...
                         digtype = 7  # create an up ramp
                         diglevel = m.job.dest[2] - 1  # the z level below
                         self.m.writeMap(
@@ -757,7 +739,7 @@ class Engine:
                         )  # unblock the tile
                         m.job = None
                     elif m.job.name == "Mining":
-                        # print "Mining..."
+                        # Mining...
                         digtype = 1
                         self.m.writeMap(
                             m.job.dest[0], m.job.dest[1], m.job.dest[2], digtype
@@ -773,7 +755,7 @@ class Engine:
                         )  # unblock the tile
                         m.job = None
                     elif m.job.name == "MoveItem":
-                        # print "Picking up Item"
+                        # Picking up Item
                         if (
                             self.m.get_items_in_queue(
                                 m.position[0], m.position[1], m.position[2]
@@ -793,18 +775,17 @@ class Engine:
                             print("SHOULD NOT GET HERE")
                             # m.job = None #.clearjob()
                     elif m.job.name == "DropItem":
-                        # print "Dropping Item"
-                        # print "Item"
-                        # pprint(mo.carrying)
+                        # Dropping Item
+                        # Item
                         m.carrying.selected = (
                             False  # set the item to false before dropping it.
                         )
                         m.carrying.inqueue = (
                             False  # set the item to false before dropping it.
                         )
-                        self.m.mapdata[m.job.dest[2]][m.job.dest[0]][
-                            m.job.dest[1]
-                        ].add(m.carrying)
+                        self.m.mapdata[m.job.dest[2]][m.job.dest[0]][m.job.dest[1]].add(
+                            m.carrying
+                        )
                         m.carrying = None
                         m.job = None  # .clearjob()
 
@@ -814,12 +795,11 @@ class Engine:
                     m.job = self.queued_jobs.pop(0)
 
     def handle_logic(self):
-        # pprint (self.queued_jobs)
         # Move Loop
         self.m.startXTile = math.floor(float(self.vpCoordinate[0]) / self.tw)
         self.m.startYTile = math.floor(float(self.vpCoordinate[1]) / self.tw)
         # tick busy
-        # dt = self.mainclock.tick_busy_loop(self.FPS)
+        dt = self.mainclock.tick_busy_loop(self.FPS)
 
     def render(self):
         self.screen.fill((0, 0, 0))

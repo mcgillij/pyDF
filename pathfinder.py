@@ -83,7 +83,7 @@ class PathFinder:
 
         return []
 
-# PRIVATE
+    # PRIVATE
 
     def _compute_g_cost(self, from_node, to_node):
         return from_node.g_cost + self.move_cost(from_node.coord, to_node.coord)

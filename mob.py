@@ -2,8 +2,8 @@ try:
     import pygame
     import sys
 
-#    from time import time
-#    import pprint
+    #    from time import time
+    #    import pprint
     from loader import load_png
     import configparser
 except ImportError as err:
