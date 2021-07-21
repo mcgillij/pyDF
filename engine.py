@@ -1,9 +1,8 @@
 """ Main Engine module """
 # noqa: E501
+import sys
 try:
     import pygame
-    import sys
-
     import pygame.locals
 
     # from time import time
